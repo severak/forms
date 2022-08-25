@@ -2,12 +2,24 @@
 namespace severak\forms;
 use severak\forms\rules;
 
+/**
+ * Main form logic.
+ *
+ * Note that this is very similar how would you define form in pure HTML but it automatically adds server-side validation.
+ *
+ * @package severak\forms
+ */
 class form
 {
+	/** @var bool Is form valid? */
 	public $isValid = true;
+	/** @var array Error messages (one for field). */
 	public $errors = [];
+	/** @var array Form values. */
 	public $values = [];
+	/** @var array Definition of fields. */
 	public $fields = [];
+	/** @var array Attributes of form itself. */
 	public $attr=[];
 
 	protected $_rules=[];
@@ -16,6 +28,11 @@ class form
 		'required' => 'Field is required.'
 	];
 
+	/**
+	 * Defines <form>.
+	 *
+	 * @param array $attr Attributes of form.
+	 */
 	public function __construct($attr=[])
 	{
 		if (empty($attr['id'])) $attr['id'] = 'form';
@@ -23,6 +40,14 @@ class form
 		$this->attr = $attr;
 	}
 
+	/**
+	 * Adds new form field. Adds some implicit validation rules and sensible defaults to attributes.
+	 *
+	 * @param string $name Form field name (must be unique).
+	 * @param array  $attr Attributes of field (label is label text).
+	 *
+	 * @throws usageException When developer used this library in bad way.
+	 */
 	public function field($name, $attr=[])
 	{
 		if (isset($this->fields[$name])) {
@@ -48,14 +73,27 @@ class form
 
 		// implicit rule's
 		if (!empty($attr['required'])) $this->rule($name, 'severak\forms\rules::required', $this->messages['required']);
-		// todo: numeric, email etc...
+		// todo: implement numeric, email etc...
 	}
 
+	/**
+	 * Adds validation rule for field.
+	 *
+	 * @param string   $name     Field name.
+	 * @param callback $callback Validation callback with signature fun($fieldValue, $allFieldValues). Must return TRUE when value is valid.
+	 * @param string   $message  Error message.
+	 */
 	public function rule($name, $callback, $message)
 	{
 		$this->_rules[$name][] = ['check'=>$callback, 'message'=>$message];
 	}
 
+	/**
+	 * Fills form with data.
+	 *
+	 * @param array $data Form data.
+	 * @return array Updated form data.
+	 */
 	public function fill($data)
 	{
 		// prefill checkboxes:
@@ -73,13 +111,24 @@ class form
 
 		return $this->values;
 	}
-	
+
+	/**
+	 * Manually adds error message to field.
+	 *
+	 * @param string $name    Field name.
+	 * @param string $message Error message.
+	 */
 	public function error($name, $message)
 	{
 		$this->errors[$name] = $message;
 		$this->isValid = false;
 	}
 
+	/**
+	 * Validates submitted form data.
+	 *
+	 * @return bool Is form valid?
+	 */
 	public function validate()
 	{
 		foreach ($this->_rules as $name => $rules) {
@@ -96,6 +145,11 @@ class form
 		return $this->isValid;
 	}
 
+	/**
+	 * Automagically turns your form into HTML code.
+	 *
+	 * @return string HTML code of form.
+	 */
 	function __toString()
 	{
 		return (string) new html($this);

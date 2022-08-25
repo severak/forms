@@ -1,6 +1,17 @@
 <?php
 namespace severak\forms;
 
+/**
+ * Ugly and hackish form to HTML converter. Produces very ugly HTML but works.
+ *
+ * If you want to use some CSS framework, you need to implement your own template calling these functions.
+ *
+ * (e.g. for Bulma CSS I use something like https://tildegit.org/severak/stela/src/branch/master/tpl/form.php)
+ *
+ * Or you can just reimplement it in Twig or whatever.
+ *
+ * @package severak\forms
+ */
 class html
 {
 	/** @var form */
@@ -103,7 +114,7 @@ class html
 				$out .= ' ' . $this->_text($field['label']) . '</label>';	
 			}	
 		}
-		// todo - radio buttons
+		// todo - implement radio buttons
 		
 		return $out;
 	}	
@@ -124,7 +135,6 @@ class html
 			$out .= $this->field($fieldName);
 			
 			if (!empty($form->errors[$fieldName])) {
-				// todo: nechceme spíš pole chyb?
 				$out .= '<p class="error-message"><em>' . $this->_text($form->errors[$fieldName]) . '</em></p>';
 			}
 		}
