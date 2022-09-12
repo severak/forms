@@ -61,8 +61,10 @@ class html
 		if (in_array($field['type'], ['submit', 'reset', 'checkbox', 'hidden'])) {
 			return ''; // these input types has no label
 		}
+
+		$required = !empty($form->fields[$fieldName]['required']) ? ' *' : '';
 		
-		return '<label for="'.$field['id'].'" class="label">' . $field['label'] . '</label>';
+		return '<label for="'.$field['id'].'" class="label">' . $field['label'] . $required . '</label>';
 	}
 	
 	function field($fieldName, $attr=[])
@@ -104,6 +106,7 @@ class html
 			}
 
 			if ($field['type']=='checkbox') {
+			    if (!isset($field['class'])) $field['class'] = '';
 				$out .= ' <label for="'.$field['id'].'" class="'.$field['class'].'">';
 				unset($field['class']);
 			}
